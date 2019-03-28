@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="ro.pub.cs.systems.eim.PracticalTest01Service"
+            android:name="ro.pub.cs.systems.eim.practicaltest01.PracticalTest01Service"
             android:enabled="true"
             android:exported="false" />
     </application>

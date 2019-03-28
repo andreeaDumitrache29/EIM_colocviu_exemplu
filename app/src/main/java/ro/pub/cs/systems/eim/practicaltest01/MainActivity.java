@@ -23,51 +23,39 @@ public class MainActivity extends AppCompatActivity {
     private int serviceStatus = Constants.SERVICE_STOPPED;
     private final static int SECONDARY_ACTIVITY_REQUEST_CODE = 1;
 
-    private void checkService(){
-        int leftNumberOfClicks = Integer.parseInt(leftEditText.getText().toString());
-        int rightNumberOfClicks = Integer.parseInt(rightEditText.getText().toString());
+    private ButtonClickListener buttonClickListener = new ButtonClickListener();
+    private class ButtonClickListener implements View.OnClickListener {
 
-        if (leftNumberOfClicks + rightNumberOfClicks > Constants.NUMBER_OF_CLICKS_THRESHOLD
-                && serviceStatus == Constants.SERVICE_STOPPED) {
-            Intent intent = new Intent(getApplicationContext(), PracticalTest01Service.class);
-            intent.putExtra("firstNumber", leftNumberOfClicks);
-            intent.putExtra("secondNumber", rightNumberOfClicks);
-            getApplicationContext().startService(intent);
-            serviceStatus = Constants.SERVICE_STARTED;
-        }
-    }
-
-    private LeftButtonClickListener leftButtonClickListener = new LeftButtonClickListener();
-    private class LeftButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            Integer left = Integer.valueOf(leftEditText.getText().toString());
-            left++;
-            leftEditText.setText(left.toString());
-            checkService();
-        }
-    }
+            int leftNumberOfClicks = Integer.valueOf(leftEditText.getText().toString());
+            int rightNumberOfClicks = Integer.valueOf(rightEditText.getText().toString());
 
-    private RightButtonClickListener rightButtonClickListener = new RightButtonClickListener();
-    private class RightButtonClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            Integer right = Integer.valueOf(rightEditText.getText().toString());
-            right++;
-            rightEditText.setText(right.toString());
-            checkService();
-        }
-    }
-
-    private NavigateButtonClickListener navigateButtonClickListener = new NavigateButtonClickListener();
-    private class NavigateButtonClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            Intent intent = new Intent(getApplicationContext(), SecondaryActivity.class);
-            int numberOfClicks = Integer.parseInt(leftEditText.getText().toString()) + Integer.parseInt(rightEditText.getText().toString());
-            intent.putExtra("numberOfClicks", numberOfClicks);
-            startActivityForResult(intent, SECONDARY_ACTIVITY_REQUEST_CODE);
-            checkService();
+            switch(view.getId()) {
+                case R.id.left_button:
+                    leftNumberOfClicks++;
+                    leftEditText.setText(String.valueOf(leftNumberOfClicks));
+                    break;
+                case R.id.right_button:
+                    rightNumberOfClicks++;
+                    rightEditText.setText(String.valueOf(rightNumberOfClicks));
+                    break;
+                case R.id.navigate_button:
+                    Intent intent = new Intent(getApplicationContext(), SecondaryActivity.class);
+                    int numberOfClicks = Integer.parseInt(leftEditText.getText().toString()) +
+                            Integer.parseInt(rightEditText.getText().toString());
+                    intent.putExtra(Constants.NUMBER_OF_CLICKS, numberOfClicks);
+                    startActivityForResult(intent, Constants.SECONDARY_ACTIVITY_REQUEST_CODE);
+                    break;
+            }
+            if (leftNumberOfClicks + rightNumberOfClicks > Constants.NUMBER_OF_CLICKS_THRESHOLD
+                    && serviceStatus == Constants.SERVICE_STOPPED) {
+                Intent intent = new Intent(getApplicationContext(), PracticalTest01Service.class);
+                intent.putExtra(Constants.FIRST_NUMBER, leftNumberOfClicks);
+                intent.putExtra(Constants.SECOND_NUMBER, rightNumberOfClicks);
+                getApplicationContext().startService(intent);
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
         }
     }
 
@@ -92,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
         leftEditText.setText(String.valueOf(0));
         rightEditText.setText(String.valueOf(0));
-        leftButton.setOnClickListener(leftButtonClickListener);
-        rightButton.setOnClickListener(rightButtonClickListener);
-        navigateButton.setOnClickListener(navigateButtonClickListener);
+        leftButton.setOnClickListener(buttonClickListener);
+        rightButton.setOnClickListener(buttonClickListener);
+        navigateButton.setOnClickListener(buttonClickListener);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("leftString")) {

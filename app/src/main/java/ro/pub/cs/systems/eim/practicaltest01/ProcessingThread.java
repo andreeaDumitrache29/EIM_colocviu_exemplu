@@ -2,6 +2,7 @@ package ro.pub.cs.systems.eim.practicaltest01;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Process;
 import android.util.Log;
 
 import java.sql.Date;
@@ -24,17 +25,17 @@ public class ProcessingThread extends Thread {
 
     @Override
     public void run() {
-        Log.d("[ProcessingThread]", "Thread has started!");
+        Log.d(Constants.PROCESSING_THREAD_TAG, "Thread has started! PID: " + Process.myPid() + " TID: " + Process.myTid());
         while (isRunning) {
             sendMessage();
             sleep();
         }
-        Log.d("[ProcessingThread]", "Thread has stopped!");
+        Log.d(Constants.PROCESSING_THREAD_TAG, "Thread has stopped!");
     }
 
     private void sleep() {
         try {
-            Thread.sleep(Constants.SLEEP_TIME);
+            Thread.sleep(1000);
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
@@ -44,7 +45,6 @@ public class ProcessingThread extends Thread {
         Intent intent = new Intent();
         intent.setAction(Constants.actionTypes[random.nextInt(Constants.actionTypes.length)]);
         intent.putExtra("message", new Date(System.currentTimeMillis()) + " " + arithmMean + " " + geometricMean);
-        intent.setAction(Constants.ACTION_STRING);
         context.sendBroadcast(intent);
     }
 
